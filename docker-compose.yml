@@ -2,15 +2,17 @@ version: '3'
 
 networks:
   slipp-network:
-    driver: bridge
 
 services:
   mariadb-master:
     image: 'mariadb-node:0.1'
     networks:
-      - slipp-network
+      slipp-network:
+        aliases:
+          - master
     ports:
       - '3306'
+    expose:
       - '22'
     volumes:
       - ./data:/bitnami/mariadb
@@ -25,9 +27,12 @@ services:
   mariadb-slave:
     image: 'mariadb-node:0.1'
     networks:
-      - slipp-network
+      slipp-network:
+        aliases:
+          - slave
     ports:
       - '3306'
+    expose:
       - '22'
     depends_on:
       - mariadb-master
@@ -45,12 +50,11 @@ services:
   mha:
     image: 'mariadb-manager:0.1'
     networks:
-      - slipp-network
-    ports:
+      slipp-network:
+        aliases:
+          - mha
+    expose:
       - '22'
     depends_on:
       - mariadb-master
       - mariadb-slave
-    links:
-      - mariadb-master:master
-      - mariadb-slave:slave
