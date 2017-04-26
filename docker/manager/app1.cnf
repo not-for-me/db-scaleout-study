@@ -1,0 +1,22 @@
+[server default]
+# working directory on the manager
+manager_workdir=/var/log/masterha/app1
+# manager log file
+manager_log=/var/log/masterha/app1/app1.log
+# working directory on MySQL servers
+remote_workdir=/var/log/masterha/app1
+
+[server1]
+hostname=master
+master_binlog_dir=/usr/local/mariadb/data
+candidate_master=1
+ 
+[server2]
+hostname=slave
+master_binlog_dir=/usr/local/mariadb/data
+candidate_master=1
+ 
+#[server3]
+#hostname=slave2
+#master_binlog_dir=/usr/local/mariadb/data
+#no_master=1
