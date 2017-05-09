@@ -14,9 +14,4 @@ candidate_master=1
 [server2]
 hostname=slave
 master_binlog_dir=/usr/local/mariadb/data
-candidate_master=1
- 
-#[server3]
-#hostname=slave2
-#master_binlog_dir=/usr/local/mariadb/data
-#no_master=1
+no_master=1

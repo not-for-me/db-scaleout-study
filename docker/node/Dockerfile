@@ -1,13 +1,12 @@
 FROM bitnami/mariadb:latest
 MAINTAINER woojin.joe
 
-RUN apt-get update && apt-get upgrade
-RUN apt-get -y install apt-utils ssh wget libdbd-mysql-perl
-RUN ssh-keygen -f ~/.ssh/id.rsa -t rsa -N ''
-EXPOSE 22
-RUN /etc/init.d/ssh start
-RUN echo 'root:1234' | chpasswd
-RUN wget https://downloads.mariadb.com/MHA/mha4mysql-node_0.53_all.deb
-RUN dpkg -i mha4mysql-node_0.53_all.deb
-RUN sed -i 's/PermitRootLogin with-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-CMD ["/usr/sbin/sshd", "-D"]
+RUN apt-get update && apt-get -y --force-yes upgrade
+RUN apt-get -y --force-yes install apt-utils ssh sshpass libdbd-mysql-perl
+
+RUN sed -n -i 's/UsePAM yes/UsePAM no/gp' /etc/ssh/sshd_config
+
+COPY ./resources/*deb /pkg/
+COPY ./resources/*.sh /root/scripts/
+
+RUN dpkg -i /pkg/mha4mysql-node_0.53_all.deb

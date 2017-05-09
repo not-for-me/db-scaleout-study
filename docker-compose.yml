@@ -1,60 +1,42 @@
 version: '3'
 
-networks:
-  slipp-network:
-
 services:
-  mariadb-master:
-    image: 'mariadb-node:0.1'
-    networks:
-      slipp-network:
-        aliases:
-          - master
+  master:
+    image: 'mariadb-node:0.2'
     ports:
       - '3306'
-    expose:
-      - '22'
-    volumes:
-      - ./data:/bitnami/mariadb
     environment:
+      - SSH_ROOT_PASSWORD=1234
       - MARIADB_REPLICATION_MODE=master
       - MARIADB_REPLICATION_USER=repl_user
       - MARIADB_REPLICATION_PASSWORD=repl_password
       - MARIADB_ROOT_PASSWORD=1234
-      - MARIADB_USER=slipp_user
+      - MARIADB_USER=slipp
       - MARIADB_PASSWORD=slipp_1234
       - MARIADB_DATABASE=slipp_study
-  mariadb-slave:
-    image: 'mariadb-node:0.1'
-    networks:
-      slipp-network:
-        aliases:
-          - slave
+  slave:
+    image: 'mariadb-node:0.2'
     ports:
       - '3306'
-    expose:
-      - '22'
     depends_on:
-      - mariadb-master
+      - master
     environment:
+      - SSH_ROOT_PASSWORD=1234
       - MARIADB_REPLICATION_MODE=slave
       - MARIADB_REPLICATION_USER=repl_user
       - MARIADB_REPLICATION_PASSWORD=repl_password
       - MARIADB_ROOT_PASSWORD=1234
-      - MARIADB_MASTER_HOST=mariadb-master
+      - MARIADB_MASTER_HOST=master
       - MARIADB_MASTER_PORT=3306
       - MARIADB_MASTER_ROOT_PASSWORD=1234
-      - MARIADB_USER=slipp_user
+      - MARIADB_USER=slipp
       - MARIADB_PASSWORD=slipp_1234
       - MARIADB_DATABASE=slipp_study
   mha:
-    image: 'mariadb-manager:0.1'
-    networks:
-      slipp-network:
-        aliases:
-          - mha
-    expose:
-      - '22'
+    image: 'mariadb-manager:0.2'
     depends_on:
-      - mariadb-master
-      - mariadb-slave
+      - slave
+    environment:
+      - SSH_ROOT_PASSWORD=1234
+    entrypoint:
+      tail -f /dev/null
